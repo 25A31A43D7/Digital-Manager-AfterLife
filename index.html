@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Afterlife Manager</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --bg2: #161b27;
+    --bg3: #1e2535;
+    --card: #1a2030;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.13);
+    --teal: #2dd4c0;
+    --teal-dim: rgba(45,212,192,0.12);
+    --teal-dim2: rgba(45,212,192,0.06);
+    --amber: #f59e0b;
+    --red: #f87171;
+    --green: #4ade80;
+    --text: #e8eaf0;
+    --text2: #8b93a8;
+    --text3: #5a6278;
+    --serif: 'DM Serif Display', serif;
+    --sans: 'DM Sans', sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 32px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+
+  /* ─── AUTH SCREEN ─── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(45,212,192,0.08) 0%, transparent 70%), var(--bg);
+    padding: 24px;
+  }
+  .auth-box {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 20px;
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.5s ease;
+  }
+  .auth-logo { text-align: center; margin-bottom: 32px; }
+  .auth-logo .logo-icon {
+    width: 56px; height: 56px;
+    background: var(--teal-dim);
+    border: 1px solid rgba(45,212,192,0.3);
+    border-radius: 16px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  .auth-logo h1 { font-family: var(--serif); font-size: 26px; color: var(--text); }
+  .auth-logo p { font-size: 13px; color: var(--text2); margin-top: 6px; }
+  .tab-row { display: flex; background: var(--bg3); border-radius: 10px; padding: 4px; margin-bottom: 28px; }
+  .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; color: var(--text2); font-family: var(--sans); font-size: 14px; font-weight: 500; border-radius: 7px; cursor: pointer; transition: all 0.2s; }
+  .tab-btn.active { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+  .form-group { margin-bottom: 16px; }
+  .form-label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 7px; font-weight: 500; }
+  .form-input {
+    width: 100%; padding: 11px 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--sans); font-size: 14px;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-input:focus { border-color: var(--teal); }
+  .form-input::placeholder { color: var(--text3); }
+  .btn-primary {
+    width: 100%; padding: 12px;
+    background: var(--teal); color: #0a1a18;
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--sans); font-size: 15px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+    margin-top: 8px;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.99); }
+  .auth-hint { text-align: center; font-size: 12px; color: var(--text3); margin-top: 16px; }
+
+  /* ─── APP SHELL ─── */
+  #app { display: none; flex-direction: column; min-height: 100vh; }
+  .topbar {
+    height: 62px; background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center;
+    padding: 0 24px; gap: 16px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-logo { font-family: var(--serif); font-size: 19px; color: var(--text); flex: 1; }
+  .topbar-logo span { color: var(--teal); }
+  .topbar-user { display: flex; align-items: center; gap: 10px; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--teal-dim); border: 1px solid rgba(45,212,192,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: var(--teal);
+  }
+  .topbar-name { font-size: 14px; color: var(--text2); }
+  .btn-logout {
+    padding: 6px 14px; background: transparent;
+    border: 1px solid var(--border2); border-radius: 7px;
+    color: var(--text2); font-family: var(--sans); font-size: 13px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+  .app-body { display: flex; flex: 1; }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: 220px; background: var(--bg2);
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    display: flex; flex-direction: column;
+    gap: 4px;
+    position: sticky; top: 62px; height: calc(100vh - 62px);
+    overflow-y: auto;
+  }
+  .sidebar-label { font-size: 10px; color: var(--text3); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 0 10px; margin: 12px 0 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 12px; border-radius: var(--radius-sm);
+    color: var(--text2); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: all 0.15s; border: none; background: none;
+    width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active { background: var(--teal-dim); color: var(--teal); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .badge { margin-left: auto; background: var(--teal); color: #0a1a18; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 20px; }
+
+  /* ─── MAIN CONTENT ─── */
+  .main { flex: 1; padding: 32px; overflow-y: auto; }
+
+  /* ─── PAGES ─── */
+  .page { display: none; animation: fadeIn 0.25s ease; }
+  .page.active { display: block; }
+
+  .page-header { margin-bottom: 28px; }
+  .page-header h2 { font-family: var(--serif); font-size: 28px; color: var(--text); }
+  .page-header p { font-size: 14px; color: var(--text2); margin-top: 6px; }
+
+  /* ─── DASHBOARD ─── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 22px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: var(--border2); }
+  .stat-icon { font-size: 22px; margin-bottom: 12px; }
+  .stat-val { font-family: var(--serif); font-size: 32px; color: var(--text); }
+  .stat-label { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .status-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+  }
+  .status-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--text); }
+  .status-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .status-row:last-child { border-bottom: none; }
+  .status-label { font-size: 13px; color: var(--text2); }
+  .status-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .pill {
+    padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+  }
+  .pill-green { background: rgba(74,222,128,0.1); color: var(--green); }
+  .pill-amber { background: rgba(245,158,11,0.1); color: var(--amber); }
+  .pill-teal { background: var(--teal-dim); color: var(--teal); }
+  .quick-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-action {
+    padding: 10px 18px; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    color: var(--text); font-family: var(--sans); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-action:hover { border-color: var(--teal); color: var(--teal); }
+
+  /* ─── VAULT ─── */
+  .toolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .search-input {
+    flex: 1; min-width: 200px; padding: 9px 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--sans); font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--teal); }
+  .search-input::placeholder { color: var(--text3); }
+  .filter-select {
+    padding: 9px 12px; background: var(--bg3);
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    color: var(--text2); font-family: var(--sans); font-size: 13px;
+    cursor: pointer; outline: none;
+  }
+  .btn-add {
+    padding: 9px 18px; background: var(--teal); color: #0a1a18;
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--sans); font-size: 13px; font-weight: 600;
+    cursor: pointer; white-space: nowrap; transition: opacity 0.2s;
+  }
+  .btn-add:hover { opacity: 0.9; }
+  .vault-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .vault-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px;
+    transition: border-color 0.2s, transform 0.15s;
+    position: relative;
+  }
+  .vault-item:hover { border-color: var(--border2); transform: translateY(-1px); }
+  .vault-item-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+  .vault-cat-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .cat-password { background: rgba(45,212,192,0.1); }
+  .cat-note { background: rgba(245,158,11,0.1); }
+  .cat-document { background: rgba(139,92,246,0.1); }
+  .cat-message { background: rgba(248,113,113,0.1); }
+  .vault-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .vault-cat { font-size: 12px; color: var(--text3); margin-top: 2px; }
+  .vault-preview {
+    font-size: 13px; color: var(--text2);
+    background: var(--bg3); border-radius: 7px; padding: 8px 10px;
+    font-family: monospace; letter-spacing: 0.05em;
+    margin-bottom: 10px;
+  }
+  .vault-footer { display: flex; align-items: center; justify-content: space-between; }
+  .vault-date { font-size: 11px; color: var(--text3); }
+  .btn-icon {
+    background: none; border: none; color: var(--text3);
+    cursor: pointer; font-size: 15px; padding: 4px;
+    border-radius: 5px; transition: all 0.15s;
+  }
+  .btn-icon:hover { color: var(--red); background: rgba(248,113,113,0.1); }
+
+  /* ─── MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: 24px;
+    opacity: 0; pointer-events: none; transition: opacity 0.2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border2);
+    border-radius: 18px; padding: 32px;
+    width: 100%; max-width: 480px;
+    transform: translateY(16px); transition: transform 0.2s;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-overlay.show .modal { transform: translateY(0); }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .modal-header h3 { font-family: var(--serif); font-size: 22px; }
+  .btn-close { background: none; border: none; color: var(--text2); font-size: 20px; cursor: pointer; padding: 4px; }
+  .modal-footer { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-cancel {
+    flex: 1; padding: 11px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text2);
+    font-family: var(--sans); font-size: 14px; cursor: pointer;
+  }
+  .btn-submit {
+    flex: 2; padding: 11px;
+    background: var(--teal); color: #0a1a18;
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-submit:hover { opacity: 0.9; }
+  .form-textarea {
+    width: 100%; padding: 11px 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--sans); font-size: 14px; resize: vertical;
+    min-height: 90px; outline: none; transition: border-color 0.2s;
+  }
+  .form-textarea:focus { border-color: var(--teal); }
+  .form-select {
+    width: 100%; padding: 11px 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--sans); font-size: 14px; outline: none;
+    transition: border-color 0.2s; cursor: pointer;
+  }
+  .form-select:focus { border-color: var(--teal); }
+
+  /* ─── CONTACTS ─── */
+  .contacts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .contact-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+    transition: border-color 0.2s;
+  }
+  .contact-card:hover { border-color: var(--border2); }
+  .contact-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 700; flex-shrink: 0;
+  }
+  .contact-info { flex: 1; }
+  .contact-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .contact-email { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .contact-rel { display: inline-block; margin-top: 8px; padding: 3px 10px; background: var(--bg3); border-radius: 20px; font-size: 12px; color: var(--text2); }
+  .contact-status { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+  /* ─── ACTIVITY LOG ─── */
+  .log-list { display: flex; flex-direction: column; gap: 8px; }
+  .log-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 18px;
+    display: flex; align-items: center; gap: 16px;
+    transition: border-color 0.15s;
+  }
+  .log-item:hover { border-color: var(--border2); }
+  .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .log-action { font-size: 14px; color: var(--text); flex: 1; }
+  .log-meta { font-size: 12px; color: var(--text3); white-space: nowrap; text-align: right; }
+  .log-meta .log-user { font-size: 12px; color: var(--text2); }
+
+  /* ─── SETTINGS ─── */
+  .settings-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 20px;
+  }
+  .settings-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 20px; color: var(--text); }
+  .setting-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+  .setting-row:last-child { border-bottom: none; }
+  .setting-info h4 { font-size: 14px; font-weight: 500; color: var(--text); }
+  .setting-info p { font-size: 12px; color: var(--text2); margin-top: 3px; }
+  .toggle {
+    position: relative; width: 42px; height: 24px;
+    background: var(--bg3); border-radius: 12px;
+    cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0;
+  }
+  .toggle::after {
+    content: ''; position: absolute;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--text2); top: 3px; left: 3px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .toggle.on { background: var(--teal-dim); border: 1px solid rgba(45,212,192,0.3); }
+  .toggle.on::after { transform: translateX(18px); background: var(--teal); }
+  .number-input {
+    width: 80px; padding: 8px 12px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-family: var(--sans); font-size: 14px; outline: none;
+    text-align: center; transition: border-color 0.2s;
+  }
+  .number-input:focus { border-color: var(--teal); }
+  .btn-save {
+    padding: 11px 28px; background: var(--teal); color: #0a1a18;
+    border: none; border-radius: var(--radius-sm);
+    font-family: var(--sans); font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .btn-save:hover { opacity: 0.9; }
+  .danger-zone { border-color: rgba(248,113,113,0.2) !important; }
+  .danger-zone h3 { color: var(--red) !important; }
+  .btn-danger {
+    padding: 10px 18px; background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3); border-radius: var(--radius-sm);
+    color: var(--red); font-family: var(--sans); font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 28px; right: 28px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 10px; padding: 12px 20px;
+    font-size: 14px; color: var(--text);
+    box-shadow: var(--shadow); z-index: 999;
+    transform: translateY(80px); opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast .toast-icon { margin-right: 8px; }
+
+  /* ─── EMPTY STATE ─── */
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
+  .empty-state p { font-size: 14px; }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── MOBILE RESPONSIVE ─── */
+  @media (max-width: 640px) {
+    .sidebar { display: none; }
+    .main { padding: 20px 16px; }
+    .auth-box { padding: 32px 24px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ AUTH SCREEN ═══════════════ -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="logo-icon">🕊️</div>
+      <h1>Afterlife Manager</h1>
+      <p>Secure your legacy, protect your loved ones</p>
+    </div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('signup')">Create Account</button>
+    </div>
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="login-email" placeholder="you@example.com" value="demo@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-pass" placeholder="••••••••" value="demo1234">
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Sign In →</button>
+    </div>
+    <div id="signup-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Full name</label>
+        <input class="form-input" type="text" id="signup-name" placeholder="Arjun Sharma">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email address</label>
+        <input class="form-input" type="email" id="signup-email" placeholder="you@example.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signup-pass" placeholder="Min. 8 characters">
+      </div>
+      <button class="btn-primary" onclick="doSignup()">Create Account →</button>
+    </div>
+    <p class="auth-hint">Any email & password works for this prototype</p>
+  </div>
+</div>
+
+<!-- ═══════════════ APP SHELL ═══════════════ -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">Afterlife <span>Manager</span></div>
+    <div class="topbar-user">
+      <div class="avatar" id="user-avatar">AS</div>
+      <span class="topbar-name" id="user-name-top">Arjun Sharma</span>
+      <button class="btn-logout" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+  <div class="app-body">
+    <nav class="sidebar">
+      <span class="sidebar-label">Overview</span>
+      <button class="nav-item active" onclick="navigate('dashboard')">
+        <span class="nav-icon">🏠</span> Dashboard
+      </button>
+      <span class="sidebar-label">My Data</span>
+      <button class="nav-item" onclick="navigate('vault')">
+        <span class="nav-icon">🔐</span> Vault
+        <span class="badge" id="vault-badge">4</span>
+      </button>
+      <button class="nav-item" onclick="navigate('contacts')">
+        <span class="nav-icon">👥</span> Trusted Contacts
+        <span class="badge" id="contacts-badge">2</span>
+      </button>
+      <span class="sidebar-label">Security</span>
+      <button class="nav-item" onclick="navigate('activity')">
+        <span class="nav-icon">📋</span> Activity Log
+      </button>
+      <button class="nav-item" onclick="navigate('settings')">
+        <span class="nav-icon">⚙️</span> Settings
+      </button>
+    </nav>
+
+    <main class="main">
+      <!-- ── DASHBOARD ── -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-header">
+          <h2 id="dashboard-greeting">Good morning, Arjun 👋</h2>
+          <p>Your digital legacy is secure and up to date.</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">🔐</div>
+            <div class="stat-val" id="stat-vault">4</div>
+            <div class="stat-label">Vault items</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-val" id="stat-contacts">2</div>
+            <div class="stat-label">Trusted contacts</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🛡️</div>
+            <div class="stat-val">30</div>
+            <div class="stat-label">Day inactivity window</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-val" style="font-size:22px;">Active</div>
+            <div class="stat-label">Account status</div>
+          </div>
+        </div>
+        <div class="status-card">
+          <h3>Security status</h3>
+          <div class="status-row">
+            <span class="status-label">Vault encryption</span>
+            <span class="pill pill-green">AES-256 Enabled</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">Last activity ping</span>
+            <span class="status-val">Today, just now</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">Inactivity alert in</span>
+            <span class="pill pill-amber">30 days</span>
+          </div>
+          <div class="status-row">
+            <span class="status-label">Nominated contacts notified</span>
+            <span class="pill pill-teal">Only on trigger</span>
+          </div>
+        </div>
+        <h3 style="font-size:14px;color:var(--text2);margin-bottom:12px;font-weight:600;">Quick actions</h3>
+        <div class="quick-actions">
+          <button class="btn-action" onclick="navigate('vault');openVaultModal()">+ Add vault item</button>
+          <button class="btn-action" onclick="navigate('contacts');openContactModal()">+ Add trusted contact</button>
+          <button class="btn-action" onclick="navigate('settings')">⚙ Adjust inactivity period</button>
+          <button class="btn-action" onclick="navigate('activity')">📋 View activity log</button>
+        </div>
+      </div>
+
+      <!-- ── VAULT ── -->
+      <div class="page" id="page-vault">
+        <div class="page-header">
+          <h2>🔐 Vault</h2>
+          <p>All your sensitive data, encrypted and secure.</p>
+        </div>
+        <div class="toolbar">
+          <input class="search-input" placeholder="🔍  Search vault items..." oninput="filterVault(this.value)">
+          <select class="filter-select" onchange="filterVaultCat(this.value)">
+            <option value="all">All categories</option>
+            <option value="password">Password</option>
+            <option value="note">Note</option>
+            <option value="document">Document</option>
+            <option value="message">Personal Message</option>
+          </select>
+          <button class="btn-add" onclick="openVaultModal()">+ Add Item</button>
+        </div>
+        <div class="vault-grid" id="vault-grid"></div>
+      </div>
+
+      <!-- ── CONTACTS ── -->
+      <div class="page" id="page-contacts">
+        <div class="page-header">
+          <h2>👥 Trusted Contacts</h2>
+          <p>These people will be notified and granted access when triggered.</p>
+        </div>
+        <div style="margin-bottom:20px">
+          <button class="btn-add" onclick="openContactModal()">+ Add Contact</button>
+        </div>
+        <div class="contacts-grid" id="contacts-grid"></div>
+      </div>
+
+      <!-- ── ACTIVITY LOG ── -->
+      <div class="page" id="page-activity">
+        <div class="page-header">
+          <h2>📋 Activity Log</h2>
+          <p>A transparent record of all actions on your account.</p>
+        </div>
+        <div class="log-list" id="log-list"></div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="page" id="page-settings">
+        <div class="page-header">
+          <h2>⚙️ Settings</h2>
+          <p>Control how and when your data is shared.</p>
+        </div>
+        <div class="settings-card">
+          <h3>🕐 Inactivity trigger</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Inactivity period (days)</h4>
+              <p>Notify contacts after this many days without activity</p>
+            </div>
+            <input class="number-input" type="number" id="inactivity-days" value="30" min="1" max="365">
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Send reminder before trigger</h4>
+              <p>Get an email warning 7 days before contacts are notified</p>
+            </div>
+            <button class="toggle on" id="toggle-reminder" onclick="toggleSetting(this)"></button>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h3>🔔 Notifications</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Push notifications</h4>
+              <p>Receive alerts about account activity</p>
+            </div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Email notifications</h4>
+              <p>Monthly digest and security alerts</p>
+            </div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+          </div>
+        </div>
+        <div class="settings-card">
+          <h3>🔒 Security</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Two-factor authentication</h4>
+              <p>Add an extra layer of login security</p>
+            </div>
+            <button class="toggle" onclick="toggleSetting(this)"></button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Login activity alerts</h4>
+              <p>Get notified of new sign-ins</p>
+            </div>
+            <button class="toggle on" onclick="toggleSetting(this)"></button>
+          </div>
+        </div>
+        <div style="margin-bottom:20px">
+          <button class="btn-save" onclick="saveSettings()">Save settings</button>
+        </div>
+        <div class="settings-card danger-zone">
+          <h3>⚠ Danger zone</h3>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Manual trigger unlock</h4>
+              <p>Immediately notify all trusted contacts right now</p>
+            </div>
+            <button class="btn-danger" onclick="manualTrigger()">Trigger Now</button>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <h4>Delete account</h4>
+              <p>Permanently remove all your data</p>
+            </div>
+            <button class="btn-danger">Delete Account</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════ VAULT MODAL ═══════════════ -->
+<div class="modal-overlay" id="vault-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Vault Item</h3>
+      <button class="btn-close" onclick="closeVaultModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input class="form-input" type="text" id="vault-title" placeholder="e.g. Gmail Password">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Category</label>
+      <select class="form-select" id="vault-cat">
+        <option value="password">🔑 Password</option>
+        <option value="note">📝 Note</option>
+        <option value="document">📄 Document</option>
+        <option value="message">💌 Personal Message</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Content</label>
+      <textarea class="form-textarea" id="vault-content" placeholder="Enter the sensitive content here. It will be encrypted."></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeVaultModal()">Cancel</button>
+      <button class="btn-submit" onclick="addVaultItem()">Save to Vault 🔐</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTACT MODAL ═══════════════ -->
+<div class="modal-overlay" id="contact-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add Trusted Contact</h3>
+      <button class="btn-close" onclick="closeContactModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Full name</label>
+      <input class="form-input" type="text" id="contact-name" placeholder="e.g. Priya Sharma">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input class="form-input" type="email" id="contact-email" placeholder="priya@example.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Relationship</label>
+      <select class="form-select" id="contact-rel">
+        <option value="Spouse">Spouse</option>
+        <option value="Parent">Parent</option>
+        <option value="Sibling">Sibling</option>
+        <option value="Child">Child</option>
+        <option value="Friend">Close Friend</option>
+        <option value="Lawyer">Lawyer</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeContactModal()">Cancel</button>
+      <button class="btn-submit" onclick="addContact()">Add Contact 👥</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+<div class="toast" id="toast"><span class="toast-icon"></span><span id="toast-msg"></span></div>
+
+<script>
+// ─── STATE ───
+let state = {
+  user: null,
+  vaultItems: [
+    { id:1, title:'Gmail Account', cat:'password', content:'Password: Secure#2024!', date:'2 Jan 2025' },
+    { id:2, title:'Letter to Family', cat:'message', content:'My dear ones, I love you all...', date:'5 Jan 2025' },
+    { id:3, title:'Insurance Policy', cat:'document', content:'Policy No: LIC-2034-XYZ. Nominee: Priya Sharma', date:'10 Jan 2025' },
+    { id:4, title:'Bank Account Details', cat:'note', content:'Account: 9876543210, IFSC: SBIN0001234', date:'15 Jan 2025' },
+  ],
+  contacts: [
+    { id:1, name:'Priya Sharma', email:'priya@example.com', rel:'Spouse', color:'#2dd4c0' },
+    { id:2, name:'Rahul Sharma', email:'rahul@example.com', rel:'Sibling', color:'#a78bfa' },
+  ],
+  logs: [
+    { action:'Signed in to account', type:'auth', time:'Today, 9:41 AM', user:'You' },
+    { action:'Added vault item: Insurance Policy', type:'vault', time:'10 Jan, 2:30 PM', user:'You' },
+    { action:'Added trusted contact: Rahul Sharma', type:'contact', time:'8 Jan, 11:00 AM', user:'You' },
+    { action:'Changed inactivity period to 30 days', type:'settings', time:'6 Jan, 4:15 PM', user:'You' },
+    { action:'Added vault item: Letter to Family', type:'vault', time:'5 Jan, 6:00 PM', user:'You' },
+    { action:'Account created', type:'auth', time:'1 Jan, 10:00 AM', user:'You' },
+  ],
+  settings: { inactivityDays: 30 },
+  nextId: 5,
+  filterText: '',
+  filterCat: 'all'
+};
+
+// ─── AUTH ───
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='signup')));
+  document.getElementById('login-form').style.display = tab==='login' ? '' : 'none';
+  document.getElementById('signup-form').style.display = tab==='signup' ? '' : 'none';
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value.trim();
+  if (!email || !pass) { showToast('⚠️','Please fill in all fields'); return; }
+  const name = email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  loginUser(name, email);
+}
+
+function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value.trim();
+  if (!name || !email || !pass) { showToast('⚠️','Please fill in all fields'); return; }
+  loginUser(name, email);
+}
+
+function loginUser(name, email) {
+  state.user = { name, email };
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const initials = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('user-avatar').textContent = initials;
+  document.getElementById('user-name-top').textContent = name;
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dashboard-greeting').textContent = `${greet}, ${name.split(' ')[0]} 👋`;
+  addLog(`Signed in to account`, 'auth');
+  renderAll();
+  showToast('✅', `Welcome back, ${name.split(' ')[0]}!`);
+}
+
+function logout() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+}
+
+// ─── NAVIGATION ───
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navItems = document.querySelectorAll('.nav-item');
+  const map = ['dashboard','vault','contacts','activity','settings'];
+  const idx = map.indexOf(page);
+  // find matching button by its text
+  navItems.forEach(n => { if (n.textContent.toLowerCase().includes(page)) n.classList.add('active'); });
+}
+
+// ─── VAULT ───
+function renderVault() {
+  const grid = document.getElementById('vault-grid');
+  let items = state.vaultItems.filter(i => {
+    const matchText = i.title.toLowerCase().includes(state.filterText.toLowerCase()) || i.content.toLowerCase().includes(state.filterText.toLowerCase());
+    const matchCat = state.filterCat === 'all' || i.cat === state.filterCat;
+    return matchText && matchCat;
+  });
+  if (!items.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">🔐</div><p>No vault items found. Add one to get started.</p></div>';
+    return;
+  }
+  const catMeta = {
+    password: { icon:'🔑', cls:'cat-password', label:'Password' },
+    note: { icon:'📝', cls:'cat-note', label:'Note' },
+    document: { icon:'📄', cls:'cat-document', label:'Document' },
+    message: { icon:'💌', cls:'cat-message', label:'Personal Message' },
+  };
+  grid.innerHTML = items.map(item => {
+    const m = catMeta[item.cat] || catMeta.note;
+    const preview = item.cat === 'password' ? '•'.repeat(Math.min(item.content.length, 18)) : item.content.slice(0,60)+(item.content.length>60?'…':'');
+    return `<div class="vault-item">
+      <div class="vault-item-header">
+        <div class="vault-cat-icon ${m.cls}">${m.icon}</div>
+        <div><div class="vault-title">${item.title}</div><div class="vault-cat">${m.label}</div></div>
+      </div>
+      <div class="vault-preview">${preview}</div>
+      <div class="vault-footer">
+        <span class="vault-date">Added ${item.date}</span>
+        <button class="btn-icon" onclick="deleteVaultItem(${item.id})" title="Delete">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('vault-badge').textContent = state.vaultItems.length;
+  document.getElementById('stat-vault').textContent = state.vaultItems.length;
+}
+
+function filterVault(val) { state.filterText = val; renderVault(); }
+function filterVaultCat(val) { state.filterCat = val; renderVault(); }
+
+function openVaultModal() { document.getElementById('vault-modal').classList.add('show'); }
+function closeVaultModal() {
+  document.getElementById('vault-modal').classList.remove('show');
+  ['vault-title','vault-content'].forEach(id => document.getElementById(id).value = '');
+}
+
+function addVaultItem() {
+  const title = document.getElementById('vault-title').value.trim();
+  const cat = document.getElementById('vault-cat').value;
+  const content = document.getElementById('vault-content').value.trim();
+  if (!title || !content) { showToast('⚠️','Please fill in all fields'); return; }
+  const now = new Date();
+  const date = now.toLocaleDateString('en-IN', {day:'numeric',month:'short',year:'numeric'});
+  state.vaultItems.unshift({ id: state.nextId++, title, cat, content, date });
+  addLog(`Added vault item: ${title}`, 'vault');
+  closeVaultModal();
+  renderVault();
+  showToast('🔐', `"${title}" saved to vault`);
+}
+
+function deleteVaultItem(id) {
+  const item = state.vaultItems.find(i=>i.id===id);
+  state.vaultItems = state.vaultItems.filter(i=>i.id!==id);
+  if (item) addLog(`Deleted vault item: ${item.title}`, 'vault');
+  renderVault();
+  showToast('🗑️', 'Item removed from vault');
+}
+
+// ─── CONTACTS ───
+const avatarColors = ['#2dd4c0','#a78bfa','#f59e0b','#f87171','#60a5fa','#4ade80'];
+
+function renderContacts() {
+  const grid = document.getElementById('contacts-grid');
+  if (!state.contacts.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">👥</div><p>No trusted contacts yet. Add someone you trust.</p></div>';
+    document.getElementById('contacts-badge').textContent = '0';
+    document.getElementById('stat-contacts').textContent = '0';
+    return;
+  }
+  grid.innerHTML = state.contacts.map(c => {
+    const initials = c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    return `<div class="contact-card">
+      <div class="contact-avatar" style="background:${c.color}22;color:${c.color}">${initials}</div>
+      <div class="contact-info">
+        <div class="contact-name">${c.name}</div>
+        <div class="contact-email">${c.email}</div>
+        <span class="contact-rel">${c.rel}</span>
+        <div class="contact-status">✅ Will be notified on trigger</div>
+      </div>
+      <button class="btn-icon" onclick="deleteContact(${c.id})" title="Remove">🗑</button>
+    </div>`;
+  }).join('');
+  document.getElementById('contacts-badge').textContent = state.contacts.length;
+  document.getElementById('stat-contacts').textContent = state.contacts.length;
+}
+
+function openContactModal() { document.getElementById('contact-modal').classList.add('show'); }
+function closeContactModal() {
+  document.getElementById('contact-modal').classList.remove('show');
+  ['contact-name','contact-email'].forEach(id => document.getElementById(id).value = '');
+}
+
+function addContact() {
+  const name = document.getElementById('contact-name').value.trim();
+  const email = document.getElementById('contact-email').value.trim();
+  const rel = document.getElementById('contact-rel').value;
+  if (!name || !email) { showToast('⚠️','Please fill in name and email'); return; }
+  const color = avatarColors[state.contacts.length % avatarColors.length];
+  state.contacts.push({ id: state.nextId++, name, email, rel, color });
+  addLog(`Added trusted contact: ${name}`, 'contact');
+  closeContactModal();
+  renderContacts();
+  showToast('👥', `${name} added as trusted contact`);
+}
+
+function deleteContact(id) {
+  const c = state.contacts.find(x=>x.id===id);
+  state.contacts = state.contacts.filter(x=>x.id!==id);
+  if (c) addLog(`Removed trusted contact: ${c.name}`, 'contact');
+  renderContacts();
+  showToast('🗑️', 'Contact removed');
+}
+
+// ─── ACTIVITY LOG ───
+const logColors = { auth:'#2dd4c0', vault:'#a78bfa', contact:'#f59e0b', settings:'#60a5fa', trigger:'#f87171' };
+
+function addLog(action, type) {
+  const now = new Date();
+  const time = 'Today, ' + now.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+  state.logs.unshift({ action, type, time, user:'You' });
+  renderLog();
+}
+
+function renderLog() {
+  const list = document.getElementById('log-list');
+  list.innerHTML = state.logs.map(log => `
+    <div class="log-item">
+      <div class="log-dot" style="background:${logColors[log.type]||'#8b93a8'}"></div>
+      <div class="log-action">${log.action}</div>
+      <div class="log-meta">
+        <div class="log-user">${log.user}</div>
+        <div>${log.time}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ─── SETTINGS ───
+function toggleSetting(btn) { btn.classList.toggle('on'); }
+
+function saveSettings() {
+  const days = document.getElementById('inactivity-days').value;
+  state.settings.inactivityDays = parseInt(days);
+  addLog(`Changed inactivity period to ${days} days`, 'settings');
+  showToast('✅', 'Settings saved');
+}
+
+function manualTrigger() {
+  if (confirm('⚠️ This will immediately notify all your trusted contacts and grant them access. Are you sure?')) {
+    addLog('Manual emergency trigger activated — contacts notified', 'trigger');
+    showToast('🚨', 'Emergency trigger sent to all contacts');
+  }
+}
+
+// ─── TOAST ───
+let toastTimer;
+function showToast(icon, msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  document.querySelector('.toast-icon').textContent = icon + ' ';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ─── INIT ───
+function renderAll() { renderVault(); renderContacts(); renderLog(); }
+
+// Close modals on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.classList.remove('show'); });
+});
+</script>
+</body>
+</html>
